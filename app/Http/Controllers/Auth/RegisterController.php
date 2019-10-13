@@ -14,6 +14,10 @@ use Illuminate\Auth\Events\Registered;
 
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
+use App\Notifications\Registration;
+use Illuminate\Support\Facades\Mail;
+
+use Config;
 
 class RegisterController extends Controller
 {
@@ -62,9 +66,16 @@ class RegisterController extends Controller
             // if the credentials are wrong we send an unauthorized error in json format
             return response()->json(['error' => 'Unauthorized'], 401);
         }
+        $userModel = new User();
+        $userModel->email = $user['email'];
+        $data = [];
+        $data['url'] = config('app.client_url').'/ad/post';
+
+        //Mail::to($user['email'])->send(new RegisterationMail($user));
+        $userModel->notify(new Registration($data));
+
         return response()->json([
             'token' => $token,
-            'type' => 'bearer', // you can ommit this
             'expires' => auth('api')->factory()->getTTL() * 60, // time to expiration
             
         ]);
@@ -101,6 +112,8 @@ class RegisterController extends Controller
             'phone' => $data['phone'],
             'username' => $data['username'],
             'password' => Hash::make($data['password']),
+            'profile_image' => '',
+
         ]);
     }
 }

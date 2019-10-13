@@ -21,11 +21,13 @@ class CreateAdsTable extends Migration
             $table->text('ad_image_2');	
             $table->text('ad_image_3');	
             $table->text('ad_image_4');
-            $table->unsigned('user_id');
+            $table->enum('ad_status',['A','B','T'])->default('A');
+            $table->text('coordinates');
+            $table->unsignedBigInteger('user_id');
             $table->text('websitelink');
-            $table->unsigned('city');
-            $table->unsigned('views');
-            $table->unsigned('favCount');
+            $table->string('city',50);
+            $table->unsignedBigInteger('views')->default(0);
+            $table->unsignedBigInteger('favCount')->default(0);
             $table->timestamps();
         });
     }

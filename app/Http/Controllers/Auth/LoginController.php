@@ -59,7 +59,7 @@ class LoginController extends Controller
 
         if (!$token = auth('api')->attempt($credentials)) {
             // if the credentials are wrong we send an unauthorized error in json format
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['message' => 'Unauthorized'], 401);
         }
         return response()->json([
             'token' => $token,
