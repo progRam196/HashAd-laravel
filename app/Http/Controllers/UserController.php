@@ -4,15 +4,34 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\User;
+use JWTAuth;
+use Image;
+
+use App\Http\Resources\Users as userResource;
+
+
 class UserController extends Controller
 {
+    public $image_width = '100' ;
+    public $image_height = '100' ;
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        $user = JWTAuth::toUser($request->header('Authorization'));
+        $user_id = $user['id'];
+        $users = User::where('id',$user_id)->first();
+        return new userResource($users);
+    }
+
+    public function verifyToken(Request $request)
+    {
+        $user = JWTAuth::toUser($request->header('Authorization'));
+        return $user;
     }
 
     /**
@@ -33,7 +52,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
     }
 
     /**
@@ -65,9 +84,26 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        $user = JWTAuth::toUser($request->header('Authorization'));
+        $id = $user['id'];
+        $validator=$request->validate([
+            "email" => 'required|unique:users,email,'.$id,
+            "phone" => 'required|numeric|unique:users,phone,'.$id,
+            //"profile_image"=>'base64image',
+            "user_type"=>'required',
+            "username"=>'required|unique:users,username,'.$id,
+            // "business_name" => 'required_if:user_type,"==",true|max:50',
+            // "business_address" => 'required_if:user_type,"==",true|max:100',
+            // "business_description" => 'required_if:user_type,"==",true|max:100'
+        ]);
+        $requested_data = $request->all(); 
+        $user = User::findOrFail($id);
+        $base64_str = $requested_data['profile_image'];
+        $requested_data['profile_image'] = $this->base64ImageUpload($base64_str); 
+        $user->update($requested_data);
+        return $user;
     }
 
     /**
@@ -79,5 +115,32 @@ class UserController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function fetch_jwt_details($token)
+    {   
+        return JWTAuth::toUser($token)->toArray();
+    }
+
+    public function base64ImageUpload($base64_str)
+    {
+        if($base64_str != '')
+        {
+            $image = base64_decode($base64_str);
+            $png_url = uniqid('PROFILE-').time().".png";
+            $path = public_path() . "/uploads/users/" . $png_url;
+            
+            $img = Image::make($base64_str);
+            $img->resize($this->image_width, $this->image_height, function ($constraint) {
+            $constraint->aspectRatio();
+            });
+            $img->resizeCanvas($this->image_width, $this->image_height); 
+            $img->save($path);
+        }
+        else {
+         $png_url = '';
+        }
+
+        return $png_url;
     }
 }

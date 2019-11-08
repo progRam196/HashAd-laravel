@@ -19,8 +19,7 @@ Route::group(['prefix' => 'user'], function () {
 
 Route::post('user/password/resetlink', 'Auth\ResetPasswordController@sendResetLink');
 Route::post('user/password/reset', 'Auth\ResetPasswordController@reset');
-
-
+Route::group(['middleware' => 'jwt.auth'], function () {
 
 Route::post('ad/create', 'AdController@create');
 Route::post('ad/list', 'AdController@index');
@@ -29,8 +28,12 @@ Route::post('hashtag/create', 'HashtagController@create');
 Route::post('hashtag/list', 'HashtagController@index');
 Route::post('hashtag/list', 'HashtagController@index');
 
+Route::post('user/profile', 'UserController@index');
+Route::post('user/update-profile', 'UserController@update');
 
+Route::post('user/verify-token', 'UserController@verifyToken');
 
+});
 
 Route::middleware('auth:jwt')->get('/user', function (Request $request) {;
     return $request->user();

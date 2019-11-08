@@ -26,13 +26,12 @@ class AdController extends Controller
      */
     public function index(Request $request)
     {
-        $this->token = $request->header('Authorization');
         $requestData = $request->all();
 
-       
-        if ($this->token != '') {      
-            JWTAuth::setToken($this->token);
-            $user = $this->fetch_jwt_details($this->token);
+        $this->token = $request->header('Authorization');
+    
+        if ($this->token != '') {  
+            $user = JWTAuth::toUser($this->token);    
             $where = [
                 ['user_id','NOT IN', $user['id']],
                 ['ad_status','=', 'A'],
@@ -91,8 +90,7 @@ class AdController extends Controller
        
         $requestData = $request->all();
         $this->token = $request->header('Authorization');
-        JWTAuth::setToken($this->token);
-        $user = $this->fetch_jwt_details($this->token);
+        $user = JWTAuth::toUser($this->token);    
         $requestData['user_id']=$user['id'];
         $requestData['ad_text'] = $request->input('adtextarea');
         $requestData['show_text'] = $request->input('adtextarea');
