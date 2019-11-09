@@ -61,4 +61,9 @@ class User extends Authenticatable implements JWTSubject
     {
         $this->notify(new ResetPasswordLink($token));
     }
+
+    public function ads()
+    {
+        return $this->hasMany('App\Ad','user_id');
+    } 
 }

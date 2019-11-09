@@ -19,21 +19,39 @@ Route::group(['prefix' => 'user'], function () {
 
 Route::post('user/password/resetlink', 'Auth\ResetPasswordController@sendResetLink');
 Route::post('user/password/reset', 'Auth\ResetPasswordController@reset');
+Route::post('hashtag/list', 'HashtagController@index');
+
 Route::group(['middleware' => 'jwt.auth'], function () {
 
 Route::post('ad/create', 'AdController@create');
 Route::post('ad/list', 'AdController@index');
+Route::post('ad/edit/{id}', 'AdController@edit');
+Route::post('ad/detail/{id}', 'AdController@show');
+
+Route::delete('ad/delete/{id}', 'AdController@destroy');
+
+Route::post('fav/update', 'FavouriteController@create');
+Route::post('fav/update-view-count', 'AdController@updateViewCount');
+
+
+
+
+
+
 
 Route::post('hashtag/create', 'HashtagController@create');
-Route::post('hashtag/list', 'HashtagController@index');
-Route::post('hashtag/list', 'HashtagController@index');
 
 Route::post('user/profile', 'UserController@index');
 Route::post('user/update-profile', 'UserController@update');
+Route::post('ad/mylist', 'AdController@userAds');
+
+
+
+
+});
 
 Route::post('user/verify-token', 'UserController@verifyToken');
 
-});
 
 Route::middleware('auth:jwt')->get('/user', function (Request $request) {;
     return $request->user();

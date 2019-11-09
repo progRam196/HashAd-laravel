@@ -3,10 +3,11 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+
 use Illuminate\Notifications\Notifiable;
 
 
-class Hashtag extends Model
+class Favourite extends Model
 {
     use Notifiable;
     /**
@@ -15,6 +16,8 @@ class Hashtag extends Model
      * @var array
      */
     protected $fillable = [
-        'hashtag','count','subscriber_count'
+        'ad_id','user_id'
     ];
+
+
 }

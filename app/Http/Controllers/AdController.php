@@ -8,11 +8,14 @@ use App\Hashtag;
 use Image;
 use JWTAuth;
 use App\Http\Resources\Ads as AdResource;
+use DB;
+use Illuminate\Support\Facades\Crypt;
+
 
 class AdController extends Controller
 {
-    public $image_width = '1200' ;
-    public $image_height = '1200' ;
+    public $image_width = '750' ;
+    public $image_height = '500' ;
     public $token = '1200' ;
 
 
@@ -33,7 +36,7 @@ class AdController extends Controller
         if ($this->token != '') {  
             $user = JWTAuth::toUser($this->token);    
             $where = [
-                ['user_id','NOT IN', $user['id']],
+               ['user_id','!=', $user['id']],
                 ['ad_status','=', 'A'],
             ];
             if(count($requestData) > 0){
@@ -70,6 +73,7 @@ class AdController extends Controller
                 }
             }
         }
+      //  print_r($where);
         $ads= Ad::where($where)->paginate(20);
 
         return AdResource::collection($ads);
@@ -132,6 +136,10 @@ class AdController extends Controller
     public function show($id)
     {
         //
+        $decryptedID = Crypt::decryptString($id);
+
+        $ad = Ad::findOrfail($decryptedID);
+        return new AdResource($ad);
     }
 
     /**
@@ -140,9 +148,53 @@ class AdController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Request $request,$id)
     {
-        //
+        $validatedData = $request->validate([
+            'adtextarea' => 'required|max:255',
+            'city' => 'required|max:50',
+            'websitelink' =>'url|max:255',
+        ]);
+       
+        $requestData = $request->all();
+        $decryptedID = Crypt::decryptString($id);
+
+        $ad = Ad::findOrFail($decryptedID);
+        $this->token = $request->header('Authorization');
+        $user = JWTAuth::toUser($this->token);    
+        $requestData['user_id']=$user['id'];
+        $requestData['ad_text'] = $request->input('adtextarea');
+        $requestData['show_text'] = $request->input('adtextarea');
+        $coordinates = $request->input('coordinates');
+        $requestData['coordinates'] = implode(",",$coordinates);
+
+        $base64_str=$request->input('adImages');
+    
+        $requestData['ad_image_1'] = $this->base64ImageUpload((isset($base64_str[0])?$base64_str[0]:''),'ad_image_1');
+        if($requestData['ad_image_1'] == '')
+        {
+            unset($requestData['ad_image_1']);
+        }
+        $requestData['ad_image_2'] = $this->base64ImageUpload((isset($base64_str[1])?$base64_str[1]:''),'ad_image_2');
+        if($requestData['ad_image_2'] == '')
+        {
+            unset($requestData['ad_image_2']);
+        }
+        $requestData['ad_image_3'] = $this->base64ImageUpload((isset($base64_str[2])?$base64_str[2]:''),'ad_image_3');
+        if($requestData['ad_image_3'] == '')
+        {
+            unset($requestData['ad_image_3']);
+        }
+        $requestData['ad_image_4'] = $this->base64ImageUpload((isset($base64_str[3])?$base64_str[3]:''),'ad_image_4');
+        $requestData['show_text'] = $this->extractHashtags($requestData['adtextarea'],1);
+        if($requestData['ad_image_4'] == '')
+        {
+            unset($requestData['ad_image_4']);
+        }
+        unset($requestData['adtextarea']);
+
+        $ad->update($requestData);
+        return ['message' => 'Ad updated!'];
     }
 
     /**
@@ -157,6 +209,21 @@ class AdController extends Controller
         //
     }
 
+    public function updateViewCount(Request $request)
+    {
+        $requested_data = $request->all(); 
+
+        $decryptedID = Crypt::decryptString($requested_data['adid']);
+
+        $user = JWTAuth::User();
+        $id = $user['id'];
+        $validator=$request->validate([
+            "adid" => 'required'
+        ]);
+        $user=DB::table('ads')->where('id', '=', $decryptedID)->increment('views');
+        return $user;
+    }
+
     /**
      * Remove the specified resource from storage.
      *
@@ -166,11 +233,14 @@ class AdController extends Controller
     public function destroy($id)
     {
         //
+        $decryptedID = Crypt::decryptString($id);
+
+        Ad::destroy($decryptedID);
     }
 
     public function base64ImageUpload($base64_str,$image_string)
     {
-        if($base64_str != '')
+        if($base64_str != '' && !(filter_var($base64_str, FILTER_VALIDATE_URL)))
         {
             $image = base64_decode($base64_str);
             $png_url = uniqid('AD-').time().".png";
@@ -190,12 +260,27 @@ class AdController extends Controller
         return $png_url;
     }
 
+    public function userAds(Request $request)
+    {
+        $requestData = $request->all();
+    
+        if ($this->token != '') {  
+            $user = JWTAuth::User();    
+            $where = [
+                ['user_id','=', $user['id']],
+            ];
+        }
+        $ads= Ad::where($where)->paginate(20);
+
+        return AdResource::collection($ads);
+    }
+
     public function fetch_jwt_details($token)
     {   
         return JWTAuth::toUser($token)->toArray();
     }
 
-    public function extractHashtags($adtextarea)
+    public function extractHashtags($adtextarea,$edit=0)
     {
         preg_match_all('/#(\w+)/', $adtextarea, $matches);
         $adText = $adtextarea;
@@ -205,7 +290,20 @@ class AdController extends Controller
             "<span class='hashtags'>".$hashtag_name."</span>",$adText);
         }
         foreach ($matches[1] as $hashtag_name) {
-           Hashtag::create(['hashtag' => $hashtag_name]);
+           $checkHashtag = Hashtag::where('hashtag', '=', $hashtag_name)->get();
+
+           if(count($checkHashtag) == 0)
+           {
+            Hashtag::create(['hashtag' => $hashtag_name,'count'=>1]);
+           }
+           else
+           {
+            if($edit == 0)
+            DB::table('hashtags')->where('hashtag', '=', $hashtag_name)->increment('count');
+
+           }
+
+
         }
         return $adText;
     }

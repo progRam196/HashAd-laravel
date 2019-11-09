@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\User;
 use JWTAuth;
 use Image;
+use Illuminate\Support\Facades\Crypt;
+
 
 use App\Http\Resources\Users as userResource;
 
@@ -30,6 +32,12 @@ class UserController extends Controller
 
     public function verifyToken(Request $request)
     {
+        if($request->header('Authorization') == '')
+        {
+            return response([
+                'message' => 'Token not provided'
+            ], 402); // Status code here
+        }
         $user = JWTAuth::toUser($request->header('Authorization'));
         return $user;
     }
@@ -66,6 +74,29 @@ class UserController extends Controller
         //
     }
 
+     /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function userAds(Request $request)
+    {
+        $requestData = $request->all();
+
+        $this->token = $request->header('Authorization');
+    
+        if ($this->token != '') {  
+            $user = JWTAuth::toUser($this->token);    
+            $where = [
+                ['id','=', $user['id']],
+            ];
+        }
+        $ads= User::where($where)->first();
+
+        return new userResource($ads);
+    }
+
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -101,7 +132,14 @@ class UserController extends Controller
         $requested_data = $request->all(); 
         $user = User::findOrFail($id);
         $base64_str = $requested_data['profile_image'];
-        $requested_data['profile_image'] = $this->base64ImageUpload($base64_str); 
+        $uploadImage = $this->base64ImageUpload($base64_str);
+        if($uploadImage != '')
+        {
+        $requested_data['profile_image'] = $uploadImage;
+        }
+        else {
+        unset($requested_data['profile_image']);
+        }
         $user->update($requested_data);
         return $user;
     }
@@ -124,7 +162,7 @@ class UserController extends Controller
 
     public function base64ImageUpload($base64_str)
     {
-        if($base64_str != '')
+        if($base64_str != '' && !(filter_var($base64_str, FILTER_VALIDATE_URL))) 
         {
             $image = base64_decode($base64_str);
             $png_url = uniqid('PROFILE-').time().".png";

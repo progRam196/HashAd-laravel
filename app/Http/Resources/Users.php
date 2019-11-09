@@ -1,6 +1,10 @@
 <?php
 
 namespace App\Http\Resources;
+use JWTAuth;
+
+use Illuminate\Support\Facades\Crypt;
+
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -18,7 +22,7 @@ class Users extends JsonResource
             'created_at'=>$this->create_at,
             'email'=>$this->email,
             'email_verified_at'=>$this->email_verified_at,
-            'id'=>$this->id,
+            'id'=>Crypt::encryptString($this->id),
             'name'=>$this->name,
             'phone'=>$this->phone,
             'profile_image'=>$this->user_image_exists($this->profile_image),
@@ -29,8 +33,23 @@ class Users extends JsonResource
             'business_name'=>$this->business_name,
             'business_address'=>$this->business_address,
             'business_description'=>$this->business_description,
+            //'ads'=>Ads::collection($this->ads),
+            'selfStatus'=>$this->self_status($this->id)
 
         ];
+    }
+
+    public function self_status($current_userid)
+    {
+        $user = JWTAuth::user();
+        $user_id = $user['id'];
+        if($current_userid == $user['id'])
+        {
+            return 1;
+        }
+        else {
+            return 0;
+        }
     }
 
     public function user_image_exists($photo)
