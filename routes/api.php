@@ -32,6 +32,11 @@ Route::delete('ad/delete/{id}', 'AdController@destroy');
 
 Route::post('fav/update', 'FavouriteController@create');
 Route::post('fav/update-view-count', 'AdController@updateViewCount');
+Route::post('user/update-follow', 'FollowerController@create');
+Route::post('user/follow-list', 'FollowerController@index');
+
+
+
 
 
 
@@ -42,15 +47,16 @@ Route::post('fav/update-view-count', 'AdController@updateViewCount');
 Route::post('hashtag/create', 'HashtagController@create');
 
 Route::post('user/profile', 'UserController@index');
+Route::post('user/profile/{id}', 'UserController@show');
 Route::post('user/update-profile', 'UserController@update');
 Route::post('ad/mylist', 'AdController@userAds');
+Route::post('user/verify-token', 'UserController@verifyToken');
 
 
 
 
 });
 
-Route::post('user/verify-token', 'UserController@verifyToken');
 
 
 Route::middleware('auth:jwt')->get('/user', function (Request $request) {;

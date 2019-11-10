@@ -28,6 +28,11 @@ class Ad extends Model
 
         return $this->hasMany('App\Favourite','ad_id')->where('user_id','=',$user['id']);
     } 
+
+    public function favourites()
+    {
+        return $this->hasMany('App\Favourite','ad_id');
+    } 
    
     // public function createUser()
     // {

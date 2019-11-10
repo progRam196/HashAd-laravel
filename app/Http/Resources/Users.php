@@ -34,7 +34,8 @@ class Users extends JsonResource
             'business_address'=>$this->business_address,
             'business_description'=>$this->business_description,
             //'ads'=>Ads::collection($this->ads),
-            'selfStatus'=>$this->self_status($this->id)
+            'selfStatus'=>$this->self_status($this->id),
+            'follow_status'=>$this->follow_status($this->followersCurrentUser)
 
         ];
     }
@@ -66,5 +67,13 @@ class Users extends JsonResource
        {
            return '';
        }     
+    }
+
+    public function follow_status($followArray)
+    {
+       if(count($followArray) > 0 )
+       return true;
+       else
+       return false;
     }
 }

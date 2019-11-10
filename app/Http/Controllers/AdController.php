@@ -14,8 +14,8 @@ use Illuminate\Support\Facades\Crypt;
 
 class AdController extends Controller
 {
-    public $image_width = '750' ;
-    public $image_height = '500' ;
+    public $image_width = '800' ;
+    public $image_height = '800' ;
     public $token = '1200' ;
 
 

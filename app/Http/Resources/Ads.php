@@ -21,6 +21,7 @@ class Ads extends Resource
         //return parent::toArray($request);
         return [
             'id'=>Crypt::encryptString($this->id),
+            'user_id'=>Crypt::encryptString($this->user_id),
             'ad_text'=>$this->ad_text,
             'show_text'=>$this->show_text,
             'websitelink'=>$this->websitelink,
@@ -31,10 +32,10 @@ class Ads extends Resource
             'city'=>$this->city,
             'views'=>$this->views,
             'favCount'=>$this->favCount,
-            'created_at' => $this->created_at,
-            'created_at' => $this->created_at,
+            'created_at' => date("F d, Y h:i:s A",strtotime($this->created_at)),
+            'updated_at' => date("F d, Y h:i:s A",strtotime($this->updated_at)),
+            'fav_count'=>$this->fav_count($this->favourites),
             'fav_status'=>$this->fav_status($this->favouritesCurrentUser),
-            'fav_count'=>$this->fav_count($this->favouritesCurrentUser),
             'createUser'=>$this->createUser
 
         ];

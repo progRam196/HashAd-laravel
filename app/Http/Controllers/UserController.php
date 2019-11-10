@@ -15,8 +15,8 @@ use App\Http\Resources\Users as userResource;
 
 class UserController extends Controller
 {
-    public $image_width = '100' ;
-    public $image_height = '100' ;
+    public $image_width = '400' ;
+    public $image_height = '400' ;
     /**
      * Display a listing of the resource.
      *
@@ -71,7 +71,9 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        //
+        $decryptedID = Crypt::decryptString($id);
+        $users = User::where('id',$decryptedID)->first();
+        return new userResource($users);
     }
 
      /**

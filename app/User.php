@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Notifications\ResetPasswordLink;
 
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use JWTAuth;
 
 
 class User extends Authenticatable implements JWTSubject
@@ -65,5 +66,11 @@ class User extends Authenticatable implements JWTSubject
     public function ads()
     {
         return $this->hasMany('App\Ad','user_id');
+    } 
+
+    public function followersCurrentUser()
+    {
+        $user = JWTAuth::user();
+        return $this->hasMany('App\Follower','user_id')->where('follower','=',$user['id']);
     } 
 }
