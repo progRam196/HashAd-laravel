@@ -264,13 +264,22 @@ class AdController extends Controller
     {
         $requestData = $request->all();
     
-        if ($this->token != '') {  
+        if(isset($requestData['user_id']))
+        {
+            $decryptedID = Crypt::decryptString($requestData['userid']);
+
+            $where = [
+                ['user_id','=', $decryptedID],
+            ];  
+        }
+        else {
             $user = JWTAuth::User();    
             $where = [
                 ['user_id','=', $user['id']],
             ];
         }
-        $ads= Ad::where($where)->paginate(20);
+      
+        $ads= Ad::where($where)->paginate(5);
 
         return AdResource::collection($ads);
     }

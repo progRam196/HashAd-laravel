@@ -20,10 +20,30 @@ class FollowerController extends Controller
      */
     public function index(Request $request)
     { 
-        $user = JWTAuth::toUser($request->header('Authorization'));
-        $user_id = $user['id'];
-        $users = Follower::where('user_id','=',$user_id)->get();
-        return  FollowResource::collection($users);
+        $requestData = $request->all();
+
+        if(isset($requestData['user_id']))
+        {
+        $decryptedID = Crypt::decryptString($requestData['user_id']);
+        }
+        else {
+            $user = JWTAuth::User();    
+            $decryptedID = $user['id'];
+        }
+
+        $followingUsers = DB::table('followers')
+            ->join('users', 'users.id', '=', 'followers.user_id')
+            ->select('users.username','user_id','follower', 'users.profile_image')
+            ->where('follower','=',$decryptedID)
+            ->get();
+        $followerUsers = DB::table('followers')
+        ->join('users', 'users.id', '=', 'followers.follower')
+        ->select('users.username','user_id','follower', 'users.profile_image')
+        ->where('user_id','=',$decryptedID)
+        ->get();
+
+        return ['followers'=>FollowResource::collection($followerUsers)
+        ,'following'=>FollowResource::collection($followingUsers)];
     }
 
     /**
