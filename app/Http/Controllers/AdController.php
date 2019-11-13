@@ -264,7 +264,7 @@ class AdController extends Controller
     {
         $requestData = $request->all();
     
-        if(isset($requestData['user_id']))
+        if(isset($requestData['userid']))
         {
             $decryptedID = Crypt::decryptString($requestData['userid']);
 

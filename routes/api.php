@@ -19,7 +19,7 @@ Route::group(['prefix' => 'user'], function () {
 
 Route::post('user/password/resetlink', 'Auth\ResetPasswordController@sendResetLink');
 Route::post('user/password/reset', 'Auth\ResetPasswordController@reset');
-Route::post('hashtag/list', 'HashtagController@index');
+//Route::post('hashtag/list', 'HashtagController@index');
 
 Route::group(['middleware' => 'jwt.auth'], function () {
 
@@ -34,6 +34,12 @@ Route::post('fav/update', 'FavouriteController@create');
 Route::post('fav/update-view-count', 'AdController@updateViewCount');
 Route::post('user/update-follow', 'FollowerController@create');
 Route::post('user/follow-list', 'FollowerController@index');
+Route::post('user/subscriptions', 'HashtagSubscriberController@index');
+Route::post('fav/subscribe', 'HashtagSubscriberController@create');
+
+Route::post('hashtag/list', 'HashtagController@index');
+
+
 
 
 

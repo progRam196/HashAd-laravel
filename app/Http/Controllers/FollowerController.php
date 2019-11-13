@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Follower;
+use App\Notification;
+
 use Illuminate\Http\Request;
 use JWTAuth;
 use DB;
@@ -64,6 +66,12 @@ class FollowerController extends Controller
         {
             unset($requestData['status']);
             Follower::create($requestData);
+            Notification::create([
+                'user_id'=>$requestData['follower'],
+                'ad_id'=>0,
+                'notify_user'=>$decryptedID,
+                'notification_type'=>1
+            ]);
             return response([
                 'message' => 'followed!'
             ], 200); 
@@ -71,6 +79,12 @@ class FollowerController extends Controller
         else
         {
             Follower::where([['follower', '=', $requestData['follower']],['user_id', '=', $requestData['user_id']]])->delete();
+            Notification::create([
+                'user_id'=>$requestData['follower'],
+                'ad_id'=>0,
+                'notify_user'=>$decryptedID,
+                'notification_type'=>2
+            ]);
             return response([
                 'message' => 'unfollowed'
             ], 200); 

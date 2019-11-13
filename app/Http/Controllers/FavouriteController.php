@@ -7,6 +7,7 @@ use JWTAuth;
 
 
 use App\Favourite;
+use App\Notification;
 use Illuminate\Http\Request;
 
 class FavouriteController extends Controller
@@ -38,6 +39,12 @@ class FavouriteController extends Controller
             unset($requestData['status']);
             $requestData['ad_id']=$decryptedADID;
             Favourite::create($requestData);
+            Notification::create([
+                'user_id'=>$requestData['user_id'],
+                'ad_id'=>$decryptedADID,
+                'notify_user'=>0,
+                'notification_type'=>3
+            ]);
             return response([
                 'message' => 'Favourite is added'
             ], 200); 
@@ -45,6 +52,12 @@ class FavouriteController extends Controller
         else
         {
             Favourite::where([['ad_id', '=', $decryptedADID],['user_id', '=', $requestData['user_id']]])->delete();
+            Notification::create([
+                'user_id'=>$requestData['user_id'],
+                'ad_id'=>$decryptedADID,
+                'notify_user'=>0,
+                'notification_type'=>4
+            ]);
             return response([
                 'message' => 'Favourite is removed'
             ], 200); 

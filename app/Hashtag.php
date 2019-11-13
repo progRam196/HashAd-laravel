@@ -4,6 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use JWTAuth;
+
 
 
 class Hashtag extends Model
@@ -17,4 +19,10 @@ class Hashtag extends Model
     protected $fillable = [
         'hashtag','count','subscriber_count'
     ];
+
+    public function subscribedUser()
+    {
+        $user = JWTAuth::user();
+        return $this->hasMany('App\HashtagSubscriber','hashtag_id')->where('hashtag_subscribers.user_id','=',$user['id']);
+    } 
 }
