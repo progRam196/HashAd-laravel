@@ -8,6 +8,8 @@ use JWTAuth;
 
 use App\Favourite;
 use App\Notification;
+use App\Ad;
+
 use Illuminate\Http\Request;
 
 class FavouriteController extends Controller
@@ -39,10 +41,12 @@ class FavouriteController extends Controller
             unset($requestData['status']);
             $requestData['ad_id']=$decryptedADID;
             Favourite::create($requestData);
+            $ad = Ad::findOrfail($decryptedADID);
+           // $ad['user_id'];
             Notification::create([
                 'user_id'=>$requestData['user_id'],
                 'ad_id'=>$decryptedADID,
-                'notify_user'=>0,
+                'notify_user'=>$ad['user_id'],
                 'notification_type'=>3
             ]);
             return response([

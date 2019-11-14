@@ -38,6 +38,9 @@ Route::post('user/subscriptions', 'HashtagSubscriberController@index');
 Route::post('fav/subscribe', 'HashtagSubscriberController@create');
 
 Route::post('hashtag/list', 'HashtagController@index');
+Route::post('user/notify-list', 'NotificationController@index');
+Route::post('user/notify-update', 'NotificationController@update');
+
 
 
 

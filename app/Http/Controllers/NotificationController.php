@@ -22,12 +22,14 @@ class NotificationController extends Controller
     {
         $user = JWTAuth::User();    
         $decryptedID = $user['id'];
-        $followingUsers = DB::table('notifications')
-        ->join('users', 'users.id', '=', 'user_id')
-        ->leftJoin('ads', 'ad.id', '=', 'ad_id')
-        ->select('users.username','user_id','notification_type','users.profile_image','ad.ad_image_1','ad.show_text')
-        ->where('notify_user','=',$decryptedID)
+        $notifications = DB::table('notifications')
+        ->join('users', 'user_id' , '=','users.id')
+        //->rightJoin('ads', 'ad_id' , '=', 'ads.id')
+        ->select('notifications.id','users.username','notifications.user_id','notifications.ad_id','notification_type','users.profile_image')//'ads.ad_image_1','ads.show_text'
+        ->where([['notify_user','=',$decryptedID],['notification_status','=','A']])
+        ->orderBy('notifications.created_at', 'desc')
         ->get();
+        
        return NotifyResource::collection($notifications);
     }
 
@@ -84,6 +86,17 @@ class NotificationController extends Controller
     public function update(Request $request, Notification $notification)
     {
         //
+        $user = JWTAuth::User();
+        $id = $user['id'];
+        $validator=$request->validate([
+            "notification_status" => 'required',
+            'id'=>'required'
+        ]);
+        $requested_data = $request->all(); 
+        $decryptedID = Crypt::decryptString($requested_data['id']);
+        $user = Notification::findOrFail($decryptedID);
+        $user->update($requested_data);
+        return $user;
     }
 
     /**

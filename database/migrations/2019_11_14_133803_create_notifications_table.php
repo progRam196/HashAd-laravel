@@ -18,7 +18,8 @@ class CreateNotificationsTable extends Migration
             $table->unsignedBigInteger('ad_id');
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('notify_user');
-            $table->enum('notification_type', [1,2,3,4,5,6,7,8,9]);	
+            $table->enum('notification_type', [1,2,3,4,5,6,7,8,9]);
+            $table->enum('notification_status', ['A','B']);
             $table->timestamps();
         });
     }
