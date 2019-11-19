@@ -41,6 +41,13 @@ Route::post('hashtag/list', 'HashtagController@index');
 Route::post('user/notify-list', 'NotificationController@index');
 Route::post('user/notify-update', 'NotificationController@update');
 
+Route::post('message/send', 'MessageController@create');
+Route::post('conversation/list', 'MessageController@index');
+Route::post('message/list/{id}', 'MessageController@show');
+
+
+
+
 
 
 

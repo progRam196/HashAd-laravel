@@ -73,8 +73,8 @@ class AdController extends Controller
                 }
             }
         }
-      //  print_r($where);
         $ads= Ad::where($where)->paginate(20);
+
 
         return AdResource::collection($ads);
     }
@@ -107,8 +107,9 @@ class AdController extends Controller
         $requestData['ad_image_2'] = $this->base64ImageUpload((isset($base64_str[1])?$base64_str[1]:''),'ad_image_2');
         $requestData['ad_image_3'] = $this->base64ImageUpload((isset($base64_str[2])?$base64_str[2]:''),'ad_image_3');
         $requestData['ad_image_4'] = $this->base64ImageUpload((isset($base64_str[3])?$base64_str[3]:''),'ad_image_4');
-        $requestData['show_text'] = $this->extractHashtags($requestData['adtextarea']);
-        
+        $hashtagExtraction = $this->extractHashtags($requestData['adtextarea'],1);
+        $requestData['show_text'] = $hashtagExtraction['ad_text'];
+        $requestData['hashtags'] = $hashtagExtraction['hashtags'];        
         unset($requestData['adtextarea']);
 
         Ad::create($requestData);
@@ -186,7 +187,10 @@ class AdController extends Controller
             unset($requestData['ad_image_3']);
         }
         $requestData['ad_image_4'] = $this->base64ImageUpload((isset($base64_str[3])?$base64_str[3]:''),'ad_image_4');
-        $requestData['show_text'] = $this->extractHashtags($requestData['adtextarea'],1);
+        $hashtagExtraction = $this->extractHashtags($requestData['adtextarea'],1);
+        $requestData['show_text'] = $hashtagExtraction['ad_text'];
+        $requestData['hashtags'] = $hashtagExtraction['hashtags'];
+
         if($requestData['ad_image_4'] == '')
         {
             unset($requestData['ad_image_4']);
@@ -314,6 +318,6 @@ class AdController extends Controller
 
 
         }
-        return $adText;
+        return ['ad_text'=>$adText,'hashtags'=>implode(",",$matches[1])];
     }
 }

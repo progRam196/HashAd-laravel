@@ -18,6 +18,25 @@ class Message extends Model
      * @var array
      */
     protected $fillable = [
-        'ad_id', 'user_id', 'message_id', 'message'
+        'ad_id', 'user_id', 'sender_id', 'message','conversation_key','conversation_initiate'
     ];
+
+    public function user()
+   {
+      return $this->belongsTo('App\User');
+   } 
+
+   public function senderUser()
+   {
+      return $this->belongsTo('App\User','sender_id','id');
+   } 
+
+   public function ad()
+   {
+      return $this->belongsTo('App\Ad');
+   } 
+   
+
+
+
 }

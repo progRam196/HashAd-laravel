@@ -23,6 +23,7 @@ class CreateAdsTable extends Migration
             $table->text('ad_image_4');
             $table->enum('ad_status',['A','B','T'])->default('A');
             $table->text('coordinates');
+            $table->longText('hashtags');	
             $table->unsignedBigInteger('user_id');
             $table->text('websitelink');
             $table->string('city',50);

@@ -18,7 +18,7 @@ class Ad extends Model
      * @var array
      */
     protected $fillable = [
-        'websitelink', 'city', 'ad_text' ,'show_text', 'ad_image_1' , 'ad_image_2', 'ad_image_3', 'ad_image_4' ,'coordinates' ,'ad_status','user_id'
+        'websitelink', 'city', 'ad_text' ,'show_text', 'ad_image_1' , 'ad_image_2', 'ad_image_3', 'ad_image_4' ,'coordinates' ,'ad_status','user_id','hashtags'
     ];
 
     public function favouritesCurrentUser()
