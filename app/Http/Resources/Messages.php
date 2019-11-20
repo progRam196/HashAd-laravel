@@ -26,14 +26,16 @@ class Messages extends JsonResource
             'conversation_key'=>Crypt::encryptString($this->conversation_key),
             'profile_image'=>$this->user_image_exists($this->user->profile_image),
             'sender_image'=>$this->user_image_exists($this->senderUser->profile_image),
-            'created_at' => date("F d, Y h:i:s A",strtotime($this->created_at)),
+            'created_at' => date("M d, h:i A",strtotime($this->created_at)),
             'ad_image_1'=>$this->ad_image_exists($this->ad->ad_image_1),
             'ad_id'=>Crypt::encryptString($this->ad->id),
             'ad_text'=>$this->ad->show_text,
             'hashtags'=>$this->ad->hashtags,
             'username'=>$this->user->username,
             'sender_name'=>$this->senderUser->username,
-            'current_user_msg_status'=>$this->self_status($this->sender_id)
+            'current_user_msg_status'=>$this->self_status($this->sender_id),
+            'bgColor'=>$this->colorSelect($this->sender_id)
+
         ];
     }
 
@@ -49,6 +51,21 @@ class Messages extends JsonResource
             return 0;
         }
     }
+
+
+    public function colorSelect($current_userid)
+    {
+        $user = JWTAuth::user();
+        $user_id = $user['id'];
+        if($current_userid == $user['id'])
+        {
+            return "#aabdab";
+        }
+        else {
+            return "#fff";
+        }
+    }
+    
 
     public function ad_image_exists($photo)
     {

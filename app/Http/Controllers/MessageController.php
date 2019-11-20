@@ -59,14 +59,17 @@ class MessageController extends Controller
         $requestData['ad_id'] = $decryptedADID;
         $requestData['sender_id'] = $sessionID;
         $requestData['user_id'] = $decryptedID;
-        $requestData['conversation_key'] = "AD".$decryptedADID."USER".$decryptedID;
-        $requestData['conversation_initiate'] = isset($requestData['status'])?$requestData['status']:2;
+        $requestData['conversation_key'] = "AD".$decryptedADID."USER".$decryptedID."SENDER".$sessionID;
+        $status = isset($requestData['status'])?$requestData['status']:2;
+        $requestData['conversation_initiate'] = $status;
         $messages = Message::where(function ($query) use ($requestData) {
             $query->where('conversation_key', '=', $requestData['conversation_key'])
                   ->Where('conversation_initiate', '=', 1);
         })->get();
 
-        if(count($messages) == 0 && $requestData['status'] == 1)
+        print_r($requestData);
+
+        if(count($messages) == 0 && $status == 1)
         {
             unset($requestData['status']);
             Message::create($requestData);
