@@ -27,10 +27,12 @@ class MessageController extends Controller
 
         $messages = Message::where(function ($query) use ($decryptedID) {
             $query->where('messages.user_id', '=', $decryptedID)
-                  ->where('conversation_initiate','=',1);
+                  ->where('conversation_initiate','=',1)
+                  ->whereRaw("NOT find_in_set($decryptedID,conversation_deleted_users)");
         })->orWhere(function ($query) use ($decryptedID) {
             $query->where('messages.sender_id', '=', $decryptedID)
-                  ->where('conversation_initiate','=',1);
+                  ->where('conversation_initiate','=',1)
+                  ->whereRaw("NOT find_in_set($decryptedID,conversation_deleted_users)");
         })->get();
 
         return MessageResource::collection($messages);
@@ -59,15 +61,15 @@ class MessageController extends Controller
         $requestData['ad_id'] = $decryptedADID;
         $requestData['sender_id'] = $sessionID;
         $requestData['user_id'] = $decryptedID;
-        $requestData['conversation_key'] = "AD".$decryptedADID."USER".$decryptedID."SENDER".$sessionID;
+
+        $requestData['conversation_key'] = $this->generateConvKey($requestData['user_id'],$requestData['sender_id'],$decryptedADID);
         $status = isset($requestData['status'])?$requestData['status']:2;
         $requestData['conversation_initiate'] = $status;
+        $requestData['conversation_deleted_users'] = '';
         $messages = Message::where(function ($query) use ($requestData) {
             $query->where('conversation_key', '=', $requestData['conversation_key'])
                   ->Where('conversation_initiate', '=', 1);
         })->get();
-
-        print_r($requestData);
 
         if(count($messages) == 0 && $status == 1)
         {
@@ -100,9 +102,12 @@ class MessageController extends Controller
     public function show($id)
     {
         $decryptedID = Crypt::decryptString($id);
+        $user = JWTAuth::User();    
+        $sessionID = $user['id'];
 
         $messages = Message::where([['messages.conversation_key', '=', $decryptedID],
-        ['conversation_initiate', '=', 2]])->get();
+        ['conversation_initiate', '=', 2]])->whereRaw("NOT find_in_set($sessionID,conversation_deleted_users)")
+        ->get();
 
         return MessageResource::collection($messages);
     }
@@ -136,8 +141,27 @@ class MessageController extends Controller
      * @param  \App\Message  $message
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Message $message)
+    public function destroy($id)
     {
-        //
+        $decryptedID = Crypt::decryptString($id);
+        $user = JWTAuth::User();    
+        $sessionID = $user['id'];
+      //  $requested_data = ['conversation_deleted_users'=>$sessionID]; 
+        $user = Message::where([['conversation_key','=', $decryptedID],['conversation_initiate','=', 1]])->first();
+
+        $concat = $user->conversation_deleted_users.",".$sessionID;
+        $requested_data = ['conversation_deleted_users'=>$concat];
+        $user->update($requested_data);
+        return $user;
+    }
+
+    public function generateConvKey($user_id,$sender_id,$ad_id)
+    {
+        $users = [$user_id,$sender_id];
+        sort($users);
+        $users = implode('USERS_',$users);
+        return "AD".$ad_id.$users;
+        
+
     }
 }

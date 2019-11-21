@@ -18,8 +18,10 @@ class Message extends Model
      * @var array
      */
     protected $fillable = [
-        'ad_id', 'user_id', 'sender_id', 'message','conversation_key','conversation_initiate'
+        'ad_id', 'user_id', 'sender_id', 'message','conversation_key','conversation_initiate','conversation_deleted_users'
     ];
+
+
 
     public function user()
    {

@@ -20,6 +20,7 @@ class CreateMessagesTable extends Migration
             $table->unsignedBigInteger('sender_id');
             $table->enum('conversation_initiate', [1,2]);
             $table->text('conversation_key');
+            $table->text('conversation_deleted_users');
             $table->text('message');
             $table->timestamps();
         });

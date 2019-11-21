@@ -34,12 +34,27 @@ class Messages extends JsonResource
             'username'=>$this->user->username,
             'sender_name'=>$this->senderUser->username,
             'current_user_msg_status'=>$this->self_status($this->sender_id),
-            'bgColor'=>$this->colorSelect($this->sender_id)
+            'bgColor'=>$this->colorSelect($this->sender_id),
+            'product_owner_status'=>$this->productOwnerStatus($this->ad->user_id)
 
         ];
     }
 
     public function self_status($current_userid)
+    {
+        $user = JWTAuth::user();
+        $user_id = $user['id'];
+        if($current_userid == $user['id'])
+        {
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    }
+
+
+    public function productOwnerStatus($current_userid)
     {
         $user = JWTAuth::user();
         $user_id = $user['id'];
