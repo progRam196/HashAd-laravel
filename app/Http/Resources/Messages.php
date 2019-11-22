@@ -74,10 +74,10 @@ class Messages extends JsonResource
         $user_id = $user['id'];
         if($current_userid == $user['id'])
         {
-            return "#aabdab";
+            return "#b8bbb8";
         }
         else {
-            return "#fff";
+            return "#e8e8e8";
         }
     }
     

@@ -48,10 +48,10 @@ class AdController extends Controller
                    array_push($where,['city','=', $city]);
                 }
                 $hashtags = $requestData['hashtags'];
-                if(count($hashtags) > 0)
-                {
-                    array_push($where,['hashtags','IN', $hashtags]);
-                }
+                // if(count($hashtags) > 0)
+                // {
+                //     array_push($where,['hashtags','IN', $hashtags]);
+                // }
             }
         }
         else {
@@ -67,13 +67,18 @@ class AdController extends Controller
                    array_push($where,['city','=', $city]);
                 }
                 $hashtags = $requestData['hashtags'];
-                if(count($hashtags) > 0)
-                {
-                    array_push($where,['hashtags','IN', $hashtags]);
-                }
+                // if(count($hashtags) > 0)
+                // {
+                //     array_push($where,['hashtags','IN', $hashtags]);
+                // }
             }
         }
+        $hashtags = $requestData['hashtags'];
+        if(count($hashtags) > 0)
+        $ads= Ad::where($where)->whereIn('hashtags',$hashtags)->paginate(20);
+        else
         $ads= Ad::where($where)->paginate(20);
+
 
 
         return AdResource::collection($ads);
@@ -89,7 +94,7 @@ class AdController extends Controller
         $validatedData = $request->validate([
             'adtextarea' => 'required|max:255',
             'city' => 'required|max:50',
-            'websitelink' =>'url|max:255',
+            'websitelink' =>'url|max:255'
         ]);
        
         $requestData = $request->all();
@@ -109,7 +114,11 @@ class AdController extends Controller
         $requestData['ad_image_4'] = $this->base64ImageUpload((isset($base64_str[3])?$base64_str[3]:''),'ad_image_4');
         $hashtagExtraction = $this->extractHashtags($requestData['adtextarea'],1);
         $requestData['show_text'] = $hashtagExtraction['ad_text'];
-        $requestData['hashtags'] = $hashtagExtraction['hashtags'];        
+        $requestData['hashtags'] = $hashtagExtraction['hashtags'];  
+        
+        if($requestData['hashtags'] == '')
+        return response(['message'=>'Atleast one hashtag is required'], 411);
+
         unset($requestData['adtextarea']);
 
         Ad::create($requestData);
@@ -154,7 +163,7 @@ class AdController extends Controller
         $validatedData = $request->validate([
             'adtextarea' => 'required|max:255',
             'city' => 'required|max:50',
-            'websitelink' =>'url|max:255',
+            'websitelink' =>'url|max:255'
         ]);
        
         $requestData = $request->all();
@@ -190,6 +199,9 @@ class AdController extends Controller
         $hashtagExtraction = $this->extractHashtags($requestData['adtextarea'],1);
         $requestData['show_text'] = $hashtagExtraction['ad_text'];
         $requestData['hashtags'] = $hashtagExtraction['hashtags'];
+
+        if($requestData['hashtags'] == '')
+        return response(['message'=>'Atleast one hashtag is required'], 411);
 
         if($requestData['ad_image_4'] == '')
         {
