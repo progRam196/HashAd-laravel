@@ -17,6 +17,8 @@ Route::group(['prefix' => 'user'], function () {
     Auth::routes();
 });
 
+Route::post('settings', 'SettingController@index');
+
 Route::post('user/password/resetlink', 'Auth\ResetPasswordController@sendResetLink');
 Route::post('user/password/reset', 'Auth\ResetPasswordController@reset');
 //Route::post('hashtag/list', 'HashtagController@index');
@@ -45,6 +47,9 @@ Route::post('message/send', 'MessageController@create');
 Route::post('conversation/list', 'MessageController@index');
 Route::post('message/list/{id}', 'MessageController@show');
 Route::delete('conversation/delete/{id}', 'MessageController@destroy');
+
+Route::post('city-list', 'CityController@index');
+
 
 
 
