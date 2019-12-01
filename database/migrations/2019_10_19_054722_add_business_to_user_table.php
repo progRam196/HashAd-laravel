@@ -15,9 +15,9 @@ class AddBusinessToUserTable extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             //
-            $table->text('business_name',100);
-            $table->text('business_address',200);
-            $table->text('business_description',300);
+            $table->text('business_name',100)->nullable();
+            $table->text('business_address',200)->nullable();
+            $table->text('business_description',300)->nullable();
 
 
         });
