@@ -65,6 +65,8 @@ class Kernel extends HttpKernel
         // THIS LINES HAS BEEN ADDED to JWT Implementation
         'jwt.auth' => \App\Http\Middleware\authJWT::class,
         'jwt.refresh' => \Tymon\JWTAuth\Http\Middleware\RefreshToken::class,
+        'cors' => \Barryvdh\Cors\HandleCors::class,
+
     ];
 
     /**

@@ -15,6 +15,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Auth::routes();
+// Route::any('/', function () {
+//     return Redirect::away('http://myvueapp.dev');
+// });
 
-Route::get('/home', 'HomeController@index')->name('home');
+//Auth::routes();
+
+//Route::get('/home', 'HomeController@index')->name('home');

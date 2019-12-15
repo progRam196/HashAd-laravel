@@ -30,7 +30,6 @@ class Hashtags extends JsonResource
 
     public function checkStatus($array)
     {
-
         if(count($array) > 0 )
         {
             return 1;

@@ -38,7 +38,7 @@ class Ads extends Resource
             'fav_status'=>$this->fav_status($this->favouritesCurrentUser),
             'createUser'=>$this->createUser
 
-        ];
+        ]; 
     }
 
     public function ad_image_exists($photo)

@@ -31,6 +31,40 @@ class AdController extends Controller
     {
         $requestData = $request->all();
 
+        $where = [
+            ['ad_status','=', 'A'],
+        ];
+        if(count($requestData) > 0){
+            
+            $city = $requestData['city'];                    
+
+            if($city != '')
+            {
+                array_push($where,['city','=', $city]);
+            }
+            $hashtags = $requestData['hashtags'];
+            // if(count($hashtags) > 0)
+            // {
+            //     array_push($where,['hashtags','IN', $hashtags]);
+            // }
+        }
+        $hashtags = $requestData['hashtags'];
+        
+        if(count($hashtags) > 0)
+        {
+        $query = $this->searchHashtagFormation($hashtags);
+        $ads= Ad::where($where)->whereRaw($query)->paginate(20);
+        }
+        else
+        $ads= Ad::where($where)->paginate(15);
+
+        return AdResource::collection($ads);
+    }
+
+    public function userBasedList(Request $request)
+    {
+        $requestData = $request->all();
+
         $this->token = $request->header('Authorization');
     
         if ($this->token != '') {  
@@ -54,32 +88,12 @@ class AdController extends Controller
                 // }
             }
         }
-        else {
-            $where = [
-                ['ad_status','=', 'A'],
-            ];
-            if(count($requestData) > 0){
-                
-                $city = $requestData['city'];                    
 
-                if($city != '')
-                {
-                   array_push($where,['city','=', $city]);
-                }
-                $hashtags = $requestData['hashtags'];
-                // if(count($hashtags) > 0)
-                // {
-                //     array_push($where,['hashtags','IN', $hashtags]);
-                // }
-            }
-        }
         $hashtags = $requestData['hashtags'];
         if(count($hashtags) > 0)
         $ads= Ad::where($where)->whereIn('hashtags',$hashtags)->paginate(20);
         else
-        $ads= Ad::where($where)->paginate(20);
-
-
+        $ads= Ad::where($where)->paginate(15);
 
         return AdResource::collection($ads);
     }
@@ -94,7 +108,7 @@ class AdController extends Controller
         $validatedData = $request->validate([
             'adtextarea' => 'required|max:255',
             'city' => 'required|max:50',
-            'websitelink' =>'url|max:255'
+            'websitelink' =>'nullable|url|max:255'
         ]);
        
         $requestData = $request->all();
@@ -163,7 +177,7 @@ class AdController extends Controller
         $validatedData = $request->validate([
             'adtextarea' => 'required|max:255',
             'city' => 'required|max:50',
-            'websitelink' =>'url|max:255'
+            'websitelink' =>'nullable|url|max:255'
         ]);
        
         $requestData = $request->all();
@@ -295,7 +309,7 @@ class AdController extends Controller
             ];
         }
       
-        $ads= Ad::where($where)->paginate(5);
+        $ads= Ad::where($where)->paginate(6);
 
         return AdResource::collection($ads);
     }
@@ -331,5 +345,20 @@ class AdController extends Controller
 
         }
         return ['ad_text'=>$adText,'hashtags'=>implode(",",$matches[1])];
+    }
+
+    public function searchHashtagFormation($hashtags)
+    {
+        $hashtagsQuery  = '';
+        $countHashtags =count($hashtags);
+        foreach ($hashtags as $key => $ht) {
+            $hashtagsQuery .= 'FIND_IN_SET("'.$ht.'",`hashtags`)';
+            if($countHashtags != $key+1)
+            {
+                $hashtagsQuery .= " or ";
+            }
+        }
+
+        return $hashtagsQuery;
     }
 }

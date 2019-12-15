@@ -15,10 +15,16 @@ class HashtagController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+       $keyword=$request->input('keyword');
+
+       if($keyword != '' && !is_object($keyword))
+       $hashtagList = Hashtag::where('hashtag', 'like', '%' . $keyword . '%')->get();
+       else
        $hashtagList = Hashtag::all();
-       return HashtagResource::collection($hashtagList);
+
+       return HashtagResource::collection($hashtagList);  
     }
 
     /**
