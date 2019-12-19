@@ -20,12 +20,13 @@ Route::group(['middleware' => ['cors','guest']], function () {
 Route::post('settings', 'SettingController@index');
 Route::post('user/password/resetlink', 'Auth\ResetPasswordController@sendResetLink');
 Route::post('user/password/reset', 'Auth\ResetPasswordController@reset');
-Route::post('hashtag/list', 'HashtagController@index');
 Route::post('ad/list', 'AdController@index');
+Route::post('inquiry', 'InquiryController@create');
 
 });
 Route::group(['middleware' => ['jwt.auth','cors']], function () {
 Route::post('hashtag/list', 'HashtagController@index');
+Route::post('hashtag/trending', 'HashtagController@trending');
 Route::post('ad/list/{id}', 'AdController@userBasedList');
 Route::post('ad/create', 'AdController@create');
 Route::post('ad/edit/{id}', 'AdController@edit');
