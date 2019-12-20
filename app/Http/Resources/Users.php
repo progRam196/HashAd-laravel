@@ -33,6 +33,8 @@ class Users extends JsonResource
             'business_name'=>$this->business_name,
             'business_address'=>$this->business_address,
             'business_description'=>$this->business_description,
+            'bio'=>$this->bio,
+            'website_link'=>$this->website_link,
             //'ads'=>Ads::collection($this->ads),
             'selfStatus'=>$this->self_status($this->id),
             'follow_status'=>$this->follow_status($this->followersCurrentUser)

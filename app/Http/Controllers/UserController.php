@@ -127,16 +127,17 @@ class UserController extends Controller
             //"profile_image"=>'base64image',
             "user_type"=>'required',
             "username"=>'required|unique:users,username,'.$id,
-            // "business_name" => 'required_if:user_type,"==",true|max:50',
-            // "business_address" => 'required_if:user_type,"==",true|max:100',
-            // "business_description" => 'required_if:user_type,"==",true|max:100'
+            'websitelink' =>'nullable|url|max:255',
+            "business_name" => 'nullable|max:50',
+            "business_address" => 'nullable|max:100',
+            "business_description" => 'nullable|max:100'
         ]);
         $requested_data = $request->all(); 
         $user = User::findOrFail($id);
         $base64_str = $requested_data['profile_image'];
         $uploadImage = $this->base64ImageUpload($base64_str);
         if($uploadImage != '')
-        {
+        { 
         $requested_data['profile_image'] = $uploadImage;
         }
         else {
