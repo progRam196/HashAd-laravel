@@ -13,10 +13,10 @@ use Illuminate\Http\Request;
 |
 */
 
+Route::group(['middleware' => ['cors','guest']], function () {
 Route::group(['prefix' => 'user'], function () {
     Auth::routes();
 });
-Route::group(['middleware' => ['cors','guest']], function () {
 Route::post('settings', 'SettingController@index');
 Route::post('user/password/resetlink', 'Auth\ResetPasswordController@sendResetLink');
 Route::post('user/password/reset', 'Auth\ResetPasswordController@reset');

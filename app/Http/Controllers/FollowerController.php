@@ -69,6 +69,7 @@ class FollowerController extends Controller
             Notification::create([
                 'user_id'=>$requestData['follower'],
                 'ad_id'=>0,
+                'hashtag_id'=>0,
                 'notify_user'=>$decryptedID,
                 'notification_type'=>1
             ]);
@@ -82,6 +83,7 @@ class FollowerController extends Controller
             Notification::create([
                 'user_id'=>$requestData['follower'],
                 'ad_id'=>0,
+                'hashtag_id'=>0,
                 'notify_user'=>$decryptedID,
                 'notification_type'=>2
             ]);

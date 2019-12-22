@@ -47,7 +47,8 @@ class FavouriteController extends Controller
                 'user_id'=>$requestData['user_id'],
                 'ad_id'=>$decryptedADID,
                 'notify_user'=>$ad['user_id'],
-                'notification_type'=>3
+                'notification_type'=>3,
+                'hashtag_id'=>0
             ]);
             return response([
                 'message' => 'Favourite is added'
@@ -59,6 +60,7 @@ class FavouriteController extends Controller
             Notification::create([
                 'user_id'=>$requestData['user_id'],
                 'ad_id'=>$decryptedADID,
+                'hashtag_id'=>0,
                 'notify_user'=>0,
                 'notification_type'=>4
             ]);

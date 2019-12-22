@@ -17,6 +17,12 @@ class Notification extends Model
      * @var array
      */
     protected $fillable = [
-        'ad_id','user_id','notify_user','notification_type','notification_status'
+        'ad_id','user_id','notify_user','hashtag_id','notification_type','notification_status'
     ];
+
+    public function ad()
+    {
+        return $this->belongsTo('App\Ad');
+    }
+
 }

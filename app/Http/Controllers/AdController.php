@@ -10,6 +10,10 @@ use JWTAuth;
 use App\Http\Resources\Ads as AdResource;
 use DB;
 use Illuminate\Support\Facades\Crypt;
+use App\HashtagSubscriber;
+use App\Notification;
+
+
 
 
 class AdController extends Controller
@@ -129,13 +133,27 @@ class AdController extends Controller
         $hashtagExtraction = $this->extractHashtags($requestData['adtextarea'],1);
         $requestData['show_text'] = $hashtagExtraction['ad_text'];
         $requestData['hashtags'] = $hashtagExtraction['hashtags'];  
+        $subscribers = $hashtagExtraction['subscribers'];
         
         if($requestData['hashtags'] == '')
         return response(['message'=>'Atleast one hashtag is required'], 411);
 
         unset($requestData['adtextarea']);
 
-        Ad::create($requestData);
+        $ad = Ad::create($requestData);
+
+        foreach($subscribers as $subs)
+        {
+            Notification::create([
+                'user_id'=>$requestData['user_id'],
+                'ad_id'=>$ad->id,
+                'notify_user'=>$subs->user_id,
+                'notification_type'=>5,
+                'hashtag_id'=>$subs->hashtag_id
+            ]);
+        }
+
+
         return ['message' => 'Ad Created!'];
  
     }
@@ -330,13 +348,15 @@ class AdController extends Controller
         }
         foreach ($matches[1] as $hashtag_name) {
            $checkHashtag = Hashtag::where('hashtag', '=', $hashtag_name)->get();
-
+           //print_r($checkHashtag);
            if(count($checkHashtag) == 0)
            {
             Hashtag::create(['hashtag' => $hashtag_name,'count'=>1]);
-           }
+           } 
            else
            {
+           $subscribers = HashtagSubscriber::where('hashtag_id','=',$checkHashtag[0]->id)->get();
+           
             if($edit == 0)
             DB::table('hashtags')->where('hashtag', '=', $hashtag_name)->increment('count');
 
@@ -344,7 +364,7 @@ class AdController extends Controller
 
 
         }
-        return ['ad_text'=>$adText,'hashtags'=>implode(",",$matches[1])];
+        return ['ad_text'=>$adText,'hashtags'=>implode(",",$matches[1]),'subscribers'=>$subscribers];
     }
 
     public function searchHashtagFormation($hashtags)

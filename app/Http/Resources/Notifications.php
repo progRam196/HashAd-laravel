@@ -20,7 +20,7 @@ class Notifications extends JsonResource
         return [
             'id'=>Crypt::encryptString($this->id),
             'user_id'=>Crypt::encryptString($this->user_id),
-           // 'ad_id'=>Crypt::encryptString($this->ad_id),
+            'ad_id'=>Crypt::encryptString($this->ad_id),
             'notification_type'=>$this->notification_type,
             'username'=>$this->username,
             //'show_text'=>$this->show_text,
@@ -45,6 +45,9 @@ class Notifications extends JsonResource
             break;
             case 4:
             $notifyMessage = ' unfavourites your ad';
+            break;
+            case 5:
+            $notifyMessage = 'Subscriptions for Hashtags ';
             break;
             default:
             $notifyMessage="no message";
