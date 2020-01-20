@@ -12,17 +12,17 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
-Route::group(['middleware' => ['cors','guest']], function () {
 Route::group(['prefix' => 'user'], function () {
     Auth::routes();
 });
+
+Route::group(['middleware' => ['cors']], function () {
 Route::post('settings', 'SettingController@index');
 Route::post('user/password/resetlink', 'Auth\ResetPasswordController@sendResetLink');
+Route::post('user/password/resetlink/', 'Auth\ResetPasswordController@sendResetLink');
 Route::post('user/password/reset', 'Auth\ResetPasswordController@reset');
 Route::post('ad/list', 'AdController@index');
 Route::post('inquiry', 'InquiryController@create');
-
 });
 Route::group(['middleware' => ['jwt.auth','cors']], function () {
 Route::post('hashtag/list', 'HashtagController@index');

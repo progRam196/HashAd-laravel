@@ -111,7 +111,7 @@ class AdController extends Controller
     {
         $validatedData = $request->validate([
             'adtextarea' => 'required|max:255',
-            'city' => 'required|max:50',
+            'city' => 'nullable|max:50',
             'websitelink' =>'nullable|url|max:255'
         ]);
        
@@ -240,7 +240,6 @@ class AdController extends Controller
             unset($requestData['ad_image_4']);
         }
         unset($requestData['adtextarea']);
-
         $ad->update($requestData);
         return ['message' => 'Ad updated!'];
     }
