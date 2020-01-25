@@ -86,11 +86,16 @@ class Messages extends JsonResource
     {
        if($photo != '')
        {
-           if(file_exists( public_path() . '/uploads/ad/' . $photo)) {
-               return url("uploads/ad/{$photo}");
-           } else {
-               return '';
-           }
+        if(env('APP_ENV') != 'local')
+        {
+            $url = Storage::disk('s3')->url('ads/'.$photo);
+            return $url;
+        }
+        if(file_exists( public_path() . '/uploads/ad/' . $photo)) {
+            return url("uploads/ad/{$photo}");
+        } else {
+            return '';
+        }
        }
        else
        {
@@ -102,11 +107,16 @@ class Messages extends JsonResource
     {
        if($photo != '')
        {
-           if(file_exists( public_path() . '/uploads/users/' . $photo)) {
-               return url("uploads/users/{$photo}");
-           } else {
-               return '';
-           }
+        if(env('APP_ENV') != 'local')
+        {
+            $url = Storage::disk('s3')->url('users/'.$photo);
+            return $url;
+        }
+        if(file_exists( public_path() . '/uploads/users/' . $photo)) {
+            return url("uploads/users/{$photo}");
+        } else {
+            return '';
+        }
        }
        else
        {

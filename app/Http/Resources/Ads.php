@@ -4,6 +4,8 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\Resource;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Storage;
+
 use JWTAuth;
 
 
@@ -32,12 +34,11 @@ class Ads extends Resource
             'city'=>$this->city,
             'views'=>$this->views,
             'favCount'=>$this->favCount,
-            'created_at' => date("F d, Y h:i:s A",strtotime($this->created_at)),
-            'updated_at' => date("F d, Y h:i:s A",strtotime($this->updated_at)),
+            'created_at' => date("F d, Y h:i A",strtotime($this->created_at)),
+            'updated_at' => date("F d, Y h:i A",strtotime($this->updated_at)),
             'fav_count'=>$this->fav_count($this->favourites),
             'fav_status'=>$this->fav_status($this->favouritesCurrentUser),
             'createUser'=>$this->createUser
-
         ]; 
     }
 
@@ -45,6 +46,11 @@ class Ads extends Resource
      {
         if($photo != '')
         {
+            if(env('APP_ENV') != 'local')
+            {
+                $url = Storage::disk('s3')->url('ads/'.$photo);
+                return $url;
+            }
             if(file_exists( public_path() . '/uploads/ad/' . $photo)) {
                 return url("uploads/ad/{$photo}");
             } else {

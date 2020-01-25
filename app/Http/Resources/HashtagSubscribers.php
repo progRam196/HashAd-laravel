@@ -30,6 +30,11 @@ class HashtagSubscribers extends JsonResource
     {
        if($photo != '')
        {
+        if(env('APP_ENV') != 'local')
+        {
+            $url = Storage::disk('s3')->url('users/'.$photo);
+            return $url;
+        }
            if(file_exists( public_path() . '/uploads/users/' . $photo)) {
                return url("uploads/users/{$photo}");
            } else {

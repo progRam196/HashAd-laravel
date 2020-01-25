@@ -8,6 +8,7 @@ use App\User;
 use JWTAuth;
 use Image;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Storage;
 
 
 use App\Http\Resources\Users as userResource;
@@ -167,16 +168,27 @@ class UserController extends Controller
     {
         if($base64_str != '' && !(filter_var($base64_str, FILTER_VALIDATE_URL))) 
         {
-            $image = base64_decode($base64_str);
+            //$image = base64_decode($base64_str);
+            // list($baseType, $image) = explode(';', $base64_str);
+            // list(, $image) = explode(',', $image);
+            // $image = base64_decode($image);
             $png_url = uniqid('PROFILE-').time().".png";
-            $path = public_path() . "/uploads/users/" . $png_url;
+            $path =  public_path()."/uploads/users/" . $png_url;
             
             $img = Image::make($base64_str);
             $img->resize($this->image_width, $this->image_height, function ($constraint) {
             $constraint->aspectRatio();
             });
             $img->resizeCanvas($this->image_width, $this->image_height); 
-            $img->save($path);
+
+            if(env('APP_ENV') == 'local')
+            {
+                $img->save($path);
+            }
+            else {
+                $resized_image = $img->stream('png', 100);
+                Storage::disk('s3')->put('users/'.$png_url,$resized_image);
+            }
         }
         else {
          $png_url = '';

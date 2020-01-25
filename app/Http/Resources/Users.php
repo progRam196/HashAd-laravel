@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 use JWTAuth;
 
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Storage;
 
 
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -59,6 +60,11 @@ class Users extends JsonResource
     {
        if($photo != '')
        {
+            if(env('APP_ENV') != 'local')
+            {
+                $url = Storage::disk('s3')->url('users/'.$photo);
+                return $url;
+            }
            if(file_exists( public_path() . '/uploads/users/' . $photo)) {
                return url("uploads/users/{$photo}");
            } else {

@@ -12,6 +12,8 @@ use DB;
 use Illuminate\Support\Facades\Crypt;
 use App\HashtagSubscriber;
 use App\Notification;
+use Illuminate\Support\Facades\Storage;
+
 
 
 
@@ -298,7 +300,15 @@ class AdController extends Controller
             $constraint->aspectRatio();
             });
             $img->resizeCanvas($this->image_width, $this->image_height); 
-            $img->save($path);
+            if(env('APP_ENV') != 'local')
+            {
+                $resized_image = $img->stream('png', 100);
+                Storage::disk('s3')->put('ads/'.$png_url,$resized_image);
+            }
+            else
+            {
+                $img->save($path);
+            }
         }
         else {
          $png_url = '';

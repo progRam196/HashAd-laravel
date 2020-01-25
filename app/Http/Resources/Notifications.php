@@ -4,6 +4,8 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Storage;
+
 
 
 class Notifications extends JsonResource
@@ -61,11 +63,16 @@ class Notifications extends JsonResource
     {
        if($photo != '')
        {
-           if(file_exists( public_path() . '/uploads/users/' . $photo)) {
-               return url("uploads/users/{$photo}");
-           } else {
-               return '';
-           }
+        if(env('APP_ENV') != 'local')
+        {
+            $url = Storage::disk('s3')->url('users/'.$photo);
+            return $url;
+        }
+        if(file_exists( public_path() . '/uploads/users/' . $photo)) {
+            return url("uploads/users/{$photo}");
+        } else {
+            return '';
+        }
        }
        else
        {
