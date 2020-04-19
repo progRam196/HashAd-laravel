@@ -131,7 +131,9 @@ class UserController extends Controller
             'websitelink' =>'nullable|url|max:255',
             "business_name" => 'nullable|max:50',
             "business_address" => 'nullable|max:100',
-            "business_description" => 'nullable|max:100'
+            "business_description" => 'nullable|max:100',
+            "country_code" => 'required|max:3'
+
         ]);
         $requested_data = $request->all(); 
         $user = User::findOrFail($id);

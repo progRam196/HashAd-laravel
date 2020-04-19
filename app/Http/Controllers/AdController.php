@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Crypt;
 use App\HashtagSubscriber;
 use App\Notification;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 
 
@@ -36,9 +37,9 @@ class AdController extends Controller
     public function index(Request $request)
     {
         $requestData = $request->all();
-
         $where = [
             ['ad_status','=', 'A'],
+            ['updated_at','>=',Carbon::now()->subDays(30)->toDateTimeString()]
         ];
         if(count($requestData) > 0){
             
@@ -59,12 +60,34 @@ class AdController extends Controller
         if(count($hashtags) > 0)
         {
         $query = $this->searchHashtagFormation($hashtags);
-        $ads= Ad::where($where)->whereRaw($query)->paginate(20);
+        $ads= Ad::where($where)->whereRaw($query);
         }
         else
-        $ads= Ad::where($where)->paginate(15);
+        $ads= Ad::where($where);
 
-        return AdResource::collection($ads);
+        
+
+        if(isset($requestData['sort_by']))
+        {
+            switch($requestData['sort_by'])
+            {
+                case 'views':
+                    $ads->orderBy('views', 'desc');
+                break;
+                case 'likes':
+                    $ads->orderBy('favCount', 'desc');
+                break;
+                case 'latest':
+                    $ads->orderBy('updated_at', 'desc');
+                break;
+                default:
+                    $ads->orderBy('updated_at', 'desc');
+                break;
+            }
+        }
+
+
+        return AdResource::collection($ads->paginate(20));
     }
 
     public function userBasedList(Request $request)

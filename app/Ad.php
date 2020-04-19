@@ -24,7 +24,12 @@ class Ad extends Model
     public function favouritesCurrentUser()
     {
         $user = JWTAuth::user();
-        return $this->hasMany('App\Favourite','ad_id')->where('user_id','=',$user['id']);
+        if($user != '') {
+            return $this->hasMany('App\Favourite','ad_id')->where('user_id','=',$user['id']);
+        } else 
+        {
+            return $this->hasMany('App\Favourite','ad_id')->where('user_id','=', 0);
+        }
     } 
 
     public function favourites()
