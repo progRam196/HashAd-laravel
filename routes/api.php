@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 */
 Route::group(['prefix' => 'user'], function () {
     Auth::routes();
+
 });
 
 Route::group(['middleware' => ['cors']], function () {
@@ -23,9 +24,11 @@ Route::post('user/password/resetlink/', 'Auth\ResetPasswordController@sendResetL
 Route::post('user/password/reset', 'Auth\ResetPasswordController@reset');
 Route::post('ad/list', 'AdController@index');
 Route::post('inquiry', 'InquiryController@create');
+Route::post('city-list', 'CityController@index');
+Route::post('hashtag/list', 'HashtagController@index');
+
 });
 Route::group(['middleware' => ['jwt.auth','cors']], function () {
-Route::post('hashtag/list', 'HashtagController@index');
 Route::post('hashtag/trending', 'HashtagController@trending');
 Route::post('ad/list/{id}', 'AdController@userBasedList');
 Route::post('ad/create', 'AdController@create');
@@ -44,7 +47,6 @@ Route::post('message/send', 'MessageController@create');
 Route::post('conversation/list', 'MessageController@index');
 Route::post('message/list/{id}', 'MessageController@show');
 Route::delete('conversation/delete/{id}', 'MessageController@destroy');
-Route::post('city-list', 'CityController@index');
 Route::post('hashtag/create', 'HashtagController@create');
 Route::post('user/profile', 'UserController@index');
 Route::post('user/profile/{id}', 'UserController@show');

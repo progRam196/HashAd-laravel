@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Crypt;
 use App\HashtagSubscriber;
 use App\Notification;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 
 
@@ -36,32 +37,56 @@ class AdController extends Controller
     public function index(Request $request)
     {
         $requestData = $request->all();
-
         $where = [
             ['ad_status','=', 'A'],
+            ['updated_at','>=',Carbon::now()->subDays(30)->toDateTimeString()]
         ];
+
+        $query = '';
+
         if(count($requestData) > 0){
             
             $city = $requestData['city'];                    
 
             if($city != '')
             {
-                array_push($where,['city','=', $city]);
+                $query .= "(`city` = '".$city."' or `city` IS NULL) ";
             }
-            $hashtags = $requestData['hashtags'];
-
         }
-        $hashtags = $requestData['hashtags'];
         
+        $hashtags = $requestData['hashtags'];
         if(count($hashtags) > 0)
         {
-        $query = $this->searchHashtagFormation($hashtags);
-        $ads= Ad::where($where)->whereRaw($query)->paginate(20);
+        $query .= " AND ";
+        $query .= $this->searchHashtagFormation($hashtags);
         }
-        else
-        $ads= Ad::where($where)->paginate(15);
 
-        return AdResource::collection($ads);
+        $ads= Ad::where($where);
+
+        if($query != '')
+        $ads->whereRaw($query);
+
+        if(isset($requestData['sort_by']))
+        {
+            switch($requestData['sort_by'])
+            {
+                case 'views':
+                    $ads->orderBy('views', 'desc');
+                break;
+                case 'likes':
+                    $ads->orderBy('favCount', 'desc');
+                break;
+                case 'latest':
+                    $ads->orderBy('updated_at', 'desc');
+                break;
+                default:
+                    $ads->orderBy('updated_at', 'desc');
+                break;
+            }
+        }
+
+
+        return AdResource::collection($ads->paginate(15));
     }
 
     public function userBasedList(Request $request)
@@ -76,29 +101,52 @@ class AdController extends Controller
                ['user_id','!=', $user['id']],
                 ['ad_status','=', 'A'],
             ];
-            if(count($requestData) > 0){
-                
-                $city = $requestData['city'];                    
+        }
+    
+        $query = '';
 
-                if($city != '')
-                {
-                   array_push($where,['city','=', $city]);
-                }
-                $hashtags = $requestData['hashtags'];
-                // if(count($hashtags) > 0)
-                // {
-                //     array_push($where,['hashtags','IN', $hashtags]);
-                // }
+        if(count($requestData) > 0){
+            
+            $city = $requestData['city'];                    
+
+            if($city != '')
+            {
+                $query .= "(`city` = '".$city."' or `city` IS NULL) ";
+            }
+        }
+        $hashtags = $requestData['hashtags'];
+        if(count($hashtags) > 0)
+        {
+        $query .= " AND ";
+        $query .= $this->searchHashtagFormation($hashtags);
+        }
+
+        $ads= Ad::where($where);
+
+        if($query != '')
+        $ads->whereRaw($query);
+        
+        if(isset($requestData['sort_by']))
+        {
+            switch($requestData['sort_by'])
+            {
+                case 'views':
+                    $ads->orderBy('views', 'desc');
+                break;
+                case 'likes':
+                    $ads->orderBy('favCount', 'desc');
+                break;
+                case 'latest':
+                    $ads->orderBy('updated_at', 'desc');
+                break;
+                default:
+                    $ads->orderBy('updated_at', 'desc');
+                break;
             }
         }
 
-        $hashtags = $requestData['hashtags'];
-        if(count($hashtags) > 0)
-        $ads= Ad::where($where)->whereIn('hashtags',$hashtags)->paginate(20);
-        else
-        $ads= Ad::where($where)->paginate(15);
 
-        return AdResource::collection($ads);
+        return AdResource::collection($ads->paginate(15));
     }
 
     /**
@@ -193,7 +241,7 @@ class AdController extends Controller
     {
         $validatedData = $request->validate([
             'adtextarea' => 'required|max:255',
-            'city' => 'required|max:50',
+            'city' => 'nullable|max:50',
             'websitelink' =>'nullable|url|max:255'
         ]);
        
@@ -333,7 +381,7 @@ class AdController extends Controller
             ];
         }
       
-        $ads= Ad::where($where)->paginate(6);
+        $ads= Ad::where($where)->orderBy('updated_at', 'desc')->paginate(6);
 
         return AdResource::collection($ads);
     }
@@ -358,6 +406,7 @@ class AdController extends Controller
            if(count($checkHashtag) == 0)
            {
             Hashtag::create(['hashtag' => $hashtag_name,'count'=>1]);
+            $subscribers=0;
            } 
            else
            {
