@@ -39,7 +39,7 @@ class AdController extends Controller
         $requestData = $request->all();
         $where = [
             ['ad_status','=', 'A'],
-            ['updated_at','>=',Carbon::now()->subDays(30)->toDateTimeString()]
+            ['updated_at','>=',Carbon::now()->subDays(100)->toDateTimeString()]
         ];
 
         $query = '';
@@ -53,7 +53,7 @@ class AdController extends Controller
                 $query .= "(`city` = '".$city."' or `city` IS NULL) ";
             }
         }
-        
+
         $hashtags = $requestData['hashtags'];
         if(count($hashtags) > 0)
         {
@@ -100,6 +100,7 @@ class AdController extends Controller
             $where = [
                ['user_id','!=', $user['id']],
                 ['ad_status','=', 'A'],
+                ['updated_at','>=',Carbon::now()->subDays(100)->toDateTimeString()]
             ];
         }
     
