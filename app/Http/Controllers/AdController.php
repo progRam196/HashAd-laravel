@@ -49,10 +49,7 @@ class AdController extends Controller
                 array_push($where,['city','=', $city]);
             }
             $hashtags = $requestData['hashtags'];
-            // if(count($hashtags) > 0)
-            // {
-            //     array_push($where,['hashtags','IN', $hashtags]);
-            // }
+
         }
         $hashtags = $requestData['hashtags'];
         
