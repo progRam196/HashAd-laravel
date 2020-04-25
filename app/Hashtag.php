@@ -23,6 +23,10 @@ class Hashtag extends Model
     public function subscribedUser()
     {
         $user = JWTAuth::user();
-        return $this->hasMany('App\HashtagSubscriber','hashtag_id','id')->where('hashtag_subscribers.user_id','=',$user['id']);
+        if($user){
+            return $this->hasMany('App\HashtagSubscriber','hashtag_id','id')->where('hashtag_subscribers.user_id','=',$user['id']);
+        } else {
+            return $this->hasMany('App\HashtagSubscriber','hashtag_id','id')->where('hashtag_subscribers.user_id','=','');
+        }
     } 
 }

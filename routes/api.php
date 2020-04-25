@@ -25,10 +25,10 @@ Route::post('user/password/reset', 'Auth\ResetPasswordController@reset');
 Route::post('ad/list', 'AdController@index');
 Route::post('inquiry', 'InquiryController@create');
 Route::post('city-list', 'CityController@index');
+Route::post('hashtag/list', 'HashtagController@index');
 
 });
 Route::group(['middleware' => ['jwt.auth','cors']], function () {
-Route::post('hashtag/list', 'HashtagController@index');
 Route::post('hashtag/trending', 'HashtagController@trending');
 Route::post('ad/list/{id}', 'AdController@userBasedList');
 Route::post('ad/create', 'AdController@create');
