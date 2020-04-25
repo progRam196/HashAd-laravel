@@ -29,7 +29,7 @@ class Users extends JsonResource
             'profile_image'=>$this->user_image_exists($this->profile_image),
             'updated_at'=>$this->updated_at,
             'user_status'=>$this->user_status,
-            'user_type'=>$this->user_type,
+            'user_type'=>$this->check_user_type($this->user_type),
             'username'=>$this->username,
             'business_name'=>$this->business_name,
             'business_address'=>$this->business_address,
@@ -41,6 +41,16 @@ class Users extends JsonResource
             'follow_status'=>$this->follow_status($this->followersCurrentUser)
 
         ];
+    }
+
+    public function check_user_type($user_type)
+    {
+        if($user_type == 'N')
+        {
+            return false;
+        }
+        return true;
+
     }
 
     public function self_status($current_userid)

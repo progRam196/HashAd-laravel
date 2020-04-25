@@ -26,7 +26,7 @@ class CreateAdsTable extends Migration
             $table->longText('hashtags');	
             $table->unsignedBigInteger('user_id');
             $table->text('websitelink');
-            $table->string('city',50);
+            $table->string('city',50)->default('NULL');;
             $table->unsignedBigInteger('views')->default(0);
             $table->unsignedBigInteger('favCount')->default(0);
             $table->timestamps();
