@@ -46,8 +46,7 @@ class AdController extends Controller
 
         if(count($requestData) > 0){
             
-            $city = $requestData['city'];                    
-
+            $city = $requestData['city'];          
             if($city != '')
             {
                 $query .= "(`city` = '".$city."' or `city` IS NULL) ";
@@ -57,7 +56,6 @@ class AdController extends Controller
         $hashtags = $requestData['hashtags'];
         if(count($hashtags) > 0)
         {
-        $query .= " AND ";
         $query .= $this->searchHashtagFormation($hashtags);
         }
 
