@@ -116,7 +116,6 @@ class AdController extends Controller
         $hashtags = $requestData['hashtags'];
         if(count($hashtags) > 0)
         {
-        $query .= " AND ";
         $query .= $this->searchHashtagFormation($hashtags);
         }
 
